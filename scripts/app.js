@@ -47,6 +47,7 @@ function save() {
 	console.log(task);
 	displayTask(task);
 	clearForm();
+	toggleForm();
 }
 
 function displayTask(task) {
@@ -75,6 +76,7 @@ function displayTask(task) {
 }
 function clearForm() {
 	$("#txtTitle").val("");
+	$("#iImportant").removeClass("fas").addClass("far");
 	$("#selDate").val("");
 	$("#txtLocation").val("");
 	$("#selPriority").val("");

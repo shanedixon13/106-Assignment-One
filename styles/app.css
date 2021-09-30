@@ -12,7 +12,7 @@ body{
 }
 .container-fluid {
 	display: flex;
-    width: 90%;
+    width: 100vw;
     justify-content: space-between;
     padding: 3rem;
 }
