@@ -1,4 +1,5 @@
 let important = false;
+let serverUrl = "https://fsdiapi.azurewebsites.net/";
 function toggleImportant() {
 	console.log("clicked");
 	if (important === false) {
@@ -44,8 +45,21 @@ function save() {
 		collaborator,
 		description
 	);
-	console.log(task);
-	displayTask(task);
+
+	$.ajax({
+		type: "POST",
+		url: serverUrl + "api/tasks",
+		data: JSON.stringify(task),
+		contentType: "application/json",
+		success: function (res) {
+			console.log("Server says", res);
+			let t = JSON.parse(res);
+			displayTask(t);
+		},
+		error: function (error) {
+			console.log("Error saving task", error);
+		},
+	});
 	clearForm();
 	toggleForm();
 }
@@ -74,9 +88,29 @@ function displayTask(task) {
 	}
 	$(".pending-tasks").append(syntax);
 }
+function getTask() {
+	$.ajax({
+		type: "GET",
+		url: serverUrl + "api/tasks",
+		success: function (res) {
+			let t = JSON.parse(res);
+			for (let i = 0; i < t.length; i++) {
+				if (t[i].name === "Shane") {
+					console.log(t[i]);
+					displayTask(t[i]);
+				}
+			}
+			console.log("Server says: " + t);
+		},
+		error: function (err) {
+			console.log("Error getting tasks: ", err);
+		},
+	});
+}
 function clearForm() {
 	$("#txtTitle").val("");
 	$("#iImportant").removeClass("fas").addClass("far");
+	important = false;
 	$("#selDate").val("");
 	$("#txtLocation").val("");
 	$("#selPriority").val("");
@@ -84,13 +118,30 @@ function clearForm() {
 	$("#txtCollaborator").val("");
 	$("#txtDescription").val("");
 }
+function clearTaskAll() {
+	console.log("Clear all");
+	$.ajax({
+		type: "DELETE",
+		url: serverUrl + "api/tasks/clear/Shane",
+		success: function (res) {
+			let t = JSON.parse(res);
+			console.log("All of the tasks have been cleared", t);
+			location.reload(true);
+		},
+		error: function (err) {
+			console.log("Something went wrong", err);
+		},
+	});
+}
 function init() {
 	console.log("Calendar System");
 	$("form").hide();
+	getTask();
 	//hook event
 	$("#iImportant").click(toggleImportant);
 	$("#btnAdd").click(toggleForm);
 	$("#btnSave").click(save);
+	$("#btnClear").click(clearTaskAll);
 	//keypress
 }
 window.onload = init;
